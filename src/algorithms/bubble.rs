@@ -1,5 +1,5 @@
-use crate::{Algorithm, AlgorithmState, List};
 use crate::bar::Bar;
+use crate::{Algorithm, AlgorithmState, List};
 
 pub struct BubbleSort {
     has_swapped_this_iteration: bool,
@@ -8,7 +8,9 @@ pub struct BubbleSort {
 
 impl Algorithm for BubbleSort {
     type Item = Bar;
-    const NAME: &'static str = "bubble sort";
+    fn name(&self) -> &'static str {
+        "bubble sort"
+    }
     fn new() -> Self {
         BubbleSort {
             has_swapped_this_iteration: false,
@@ -36,5 +38,9 @@ impl Algorithm for BubbleSort {
             self.current_position += 1;
             AlgorithmState::Busy
         }
+    }
+
+    fn reset(&mut self) {
+        *self = Self::new();
     }
 }

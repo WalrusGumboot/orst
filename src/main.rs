@@ -1,8 +1,8 @@
 const WIN_HEIGHT: u32 = 640;
-const BAR_WIDTH: u32 = 20;
 const BAR_HEIGHT_MARGIN: u32 = 20;
 const FPS: f64 = 60.0;
 
+use clap::Parser;
 use sdl2::{
     event::Event,
     keyboard::Keycode,
@@ -19,8 +19,8 @@ mod algorithms;
 mod bar;
 mod util;
 
-use bar::Bar;
 use algorithms::*;
+use bar::Bar;
 
 fn draw_text(
     text: &str,
@@ -41,10 +41,31 @@ fn draw_text(
     )
 }
 
-fn main() {
-    let mut list: List<Bar> = List::shuffled(NUM_ELEM);
+#[derive(Parser)]
+struct Args {
+    #[arg(short, long, default_value = "40")]
+    bars: usize,
+    #[arg(short, long, default_value = "20")]
+    width: u32,
+    #[arg(short, long, default_value = "gnome")]
+    algorithm: AlgorithmType,
+}
 
-    let mut algorithm = optimised_bubble::OptimisedBubbleSort::new();
+fn main() {
+    // BEFORE ANYTHING: INITIALISE CELLS
+    let args = Args::parse();
+    unsafe {
+        NUM_ELEM_CELL.get_or_init(|| args.bars);
+    }
+
+    let num_elem_from_cell = unsafe { *NUM_ELEM_CELL.get().unwrap() };
+
+    let mut list: List<Bar> = List::shuffled(num_elem_from_cell);
+    let mut algorithm: Box<dyn Algorithm<Item = Bar>> = match args.algorithm {
+        AlgorithmType::Gnome => Box::new(gnome::GnomeSort::new()),
+        AlgorithmType::Bubble => Box::new(bubble::BubbleSort::new()),
+        AlgorithmType::OptimisedBubble => Box::new(optimised_bubble::OptimisedBubbleSort::new()),
+    };
 
     let sdl2_ctx = sdl2::init().expect("could not initialise SDL2.");
     let video_subsytem = sdl2_ctx
@@ -53,7 +74,7 @@ fn main() {
     let window = video_subsytem
         .window(
             "orst - a sorting algorithm visualiser",
-            BAR_WIDTH * NUM_ELEM as u32,
+            args.width * num_elem_from_cell as u32,
             WIN_HEIGHT,
         )
         .position_centered()
@@ -75,23 +96,29 @@ fn main() {
     let title_text_surface = title_text.blended(Color::BLACK).unwrap();
     let title_text_texture = title_text_surface.as_texture(&texture_creator).unwrap();
 
-    
     'run: loop {
         canvas.set_draw_color(Color::RGB(216, 222, 235));
         canvas.clear();
-        
-        canvas.copy(
-            &title_text_texture,
-            None,
-            Rect::new(10, 10, title_text_surface.width(), title_text_surface.height()),
-        ).unwrap();
+
+        canvas
+            .copy(
+                &title_text_texture,
+                None,
+                Rect::new(
+                    10,
+                    10,
+                    title_text_surface.width(),
+                    title_text_surface.height(),
+                ),
+            )
+            .unwrap();
 
         match algorithm.tick(&mut list) {
             AlgorithmState::Busy => {}
             AlgorithmState::Done => {
                 if goto_next {
                     algorithm.reset();
-                    list = List::<Bar>::shuffled(NUM_ELEM);
+                    list = List::<Bar>::shuffled(num_elem_from_cell);
                     goto_next = false;
                 }
             }
@@ -106,14 +133,14 @@ fn main() {
                 bar.colour
             };
 
-            let t = (bar.value + 1) as f64 / (NUM_ELEM) as f64;
+            let t = (bar.value + 1) as f64 / num_elem_from_cell as f64;
             let bar_height = ((1.0 - t) * BAR_HEIGHT_MARGIN as f64
                 + t * (WIN_HEIGHT - BAR_HEIGHT_MARGIN) as f64) as u32;
 
             let rect = Rect::new(
-                i as i32 * BAR_WIDTH as i32,
+                i as i32 * args.width as i32,
                 (WIN_HEIGHT - bar_height) as i32,
-                BAR_WIDTH,
+                args.width,
                 bar_height,
             );
 

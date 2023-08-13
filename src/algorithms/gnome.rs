@@ -1,5 +1,5 @@
-use crate::{Algorithm, AlgorithmState, List};
 use crate::bar::Bar;
+use crate::{Algorithm, AlgorithmState, List};
 
 pub struct GnomeSort {
     gnome_pos: usize,
@@ -7,7 +7,9 @@ pub struct GnomeSort {
 
 impl Algorithm for GnomeSort {
     type Item = Bar;
-    const NAME: &'static str = "gnome sort";
+    fn name(&self) -> &'static str {
+        "gnome sort"
+    }
     fn new() -> Self {
         GnomeSort { gnome_pos: 0 }
     }
@@ -25,5 +27,9 @@ impl Algorithm for GnomeSort {
             }
             AlgorithmState::Busy
         }
+    }
+
+    fn reset(&mut self) {
+        *self = Self::new();
     }
 }

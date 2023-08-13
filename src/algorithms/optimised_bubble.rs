@@ -1,5 +1,5 @@
-use crate::{Algorithm, AlgorithmState, List, NUM_ELEM};
 use crate::bar::Bar;
+use crate::{Algorithm, AlgorithmState, List, NUM_ELEM_CELL};
 
 pub struct OptimisedBubbleSort {
     has_swapped_this_iteration: bool,
@@ -9,12 +9,14 @@ pub struct OptimisedBubbleSort {
 
 impl Algorithm for OptimisedBubbleSort {
     type Item = Bar;
-    const NAME: &'static str = "optimised bubble sort";
+    fn name(&self) -> &'static str {
+        "optimised bubble sort"
+    }
     fn new() -> Self {
         OptimisedBubbleSort {
             has_swapped_this_iteration: false,
             current_position: 1,
-            already_ok: NUM_ELEM
+            already_ok: unsafe { *NUM_ELEM_CELL.get().unwrap() },
         }
     }
 
@@ -39,5 +41,9 @@ impl Algorithm for OptimisedBubbleSort {
             self.current_position += 1;
             AlgorithmState::Busy
         }
+    }
+
+    fn reset(&mut self) {
+        *self = Self::new();
     }
 }

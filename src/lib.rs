@@ -1,4 +1,6 @@
-pub const NUM_ELEM: usize = 40;
+use std::cell::OnceCell;
+
+pub static mut NUM_ELEM_CELL: OnceCell<usize> = OnceCell::new();
 
 pub struct List<T>
 where
@@ -99,26 +101,21 @@ pub enum AlgorithmState {
 
 pub trait Algorithm
 where
-    Self::Item: Ord + Clone + From<usize>,
-    Self: Sized,
+    Self::Item: ListItem,
 {
     type Item;
-    const NAME: &'static str;
-    fn new() -> Self;
+    fn new() -> Self
+    where
+        Self: Sized;
     fn tick(&mut self, l: &mut List<Self::Item>) -> AlgorithmState;
-    fn reset(&mut self) {
-        *self = Self::new();
-    }
-    fn name(&self) -> &'static str { Self::NAME }
+    fn reset(&mut self);
+    fn name(&self) -> &'static str;
 }
 
 mod algorithms;
-mod util;
 mod bar;
+mod util;
 
 ////////////////////////////////////////////
 //            BAR RELATED CODE            //
 ////////////////////////////////////////////
-
-
-

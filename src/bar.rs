@@ -1,7 +1,7 @@
 use sdl2::pixels::Color;
 use std::cmp::Ordering::{self, *};
 
-use crate::{util::lerp_color, ListItem, NUM_ELEM};
+use crate::{util::lerp_color, ListItem, NUM_ELEM_CELL};
 
 pub const LEFT_COLOR: Color = Color::RGB(222, 100, 91);
 pub const RIGHT_COLOUR: Color = Color::RGB(126, 160, 224);
@@ -17,7 +17,11 @@ impl From<usize> for Bar {
     fn from(value: usize) -> Self {
         Bar {
             value,
-            colour: lerp_color(LEFT_COLOR, RIGHT_COLOUR, value as f64 / NUM_ELEM as f64),
+            colour: lerp_color(
+                LEFT_COLOR,
+                RIGHT_COLOUR,
+                value as f64 / unsafe { *NUM_ELEM_CELL.get().unwrap() } as f64,
+            ),
             selected: false,
         }
     }
