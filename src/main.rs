@@ -66,6 +66,7 @@ fn main() {
         AlgorithmType::Gnome => Box::new(gnome::GnomeSort::new()),
         AlgorithmType::Bubble => Box::new(bubble::BubbleSort::new()),
         AlgorithmType::OptimisedBubble => Box::new(optimised_bubble::OptimisedBubbleSort::new()),
+        AlgorithmType::Comb => Box::new(comb::CombSort::new())
     };
 
     let sdl2_ctx = sdl2::init().expect("could not initialise SDL2.");
