@@ -49,7 +49,7 @@ struct Args {
     #[arg(short, long, default_value = "gnome")]
     algorithm: AlgorithmType,
     #[arg(short, long, default_value = "60.0")]
-    fps: f64
+    fps: f64,
 }
 
 fn main() {
@@ -61,12 +61,13 @@ fn main() {
 
     let num_elem_from_cell = unsafe { *NUM_ELEM_CELL.get().unwrap() };
 
-    let mut list: List<Bar> = List::shuffled(num_elem_from_cell);
+    let mut list: List<Bar> = List::reversed(num_elem_from_cell);
     let mut algorithm: Box<dyn Algorithm<Item = Bar>> = match args.algorithm {
         AlgorithmType::Gnome => Box::new(gnome::GnomeSort::new()),
         AlgorithmType::Bubble => Box::new(bubble::BubbleSort::new()),
         AlgorithmType::OptimisedBubble => Box::new(optimised_bubble::OptimisedBubbleSort::new()),
-        AlgorithmType::Comb => Box::new(comb::CombSort::new())
+        AlgorithmType::Comb => Box::new(comb::CombSort::new()),
+        AlgorithmType::Insertion => Box::new(insertion::InsertionSort::new()),
     };
 
     let sdl2_ctx = sdl2::init().expect("could not initialise SDL2.");

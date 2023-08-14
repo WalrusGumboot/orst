@@ -33,6 +33,16 @@ impl<T: ListItem> List<T> {
         }
     }
 
+    pub fn reversed(size: usize) -> Self {
+        List {
+            size,
+            content: (0..size).map(|i| T::from(size - i)).collect(),
+            selected_indices: (None, None),
+            reads: 0,
+            writes: 0,
+        }
+    }
+
     pub fn shuffled(size: usize) -> Self {
         use rand::seq::SliceRandom;
         use rand::thread_rng;
