@@ -15,10 +15,10 @@ impl Algorithm for GnomeSort {
     }
 
     fn tick(&mut self, l: &mut List<Self::Item>) -> AlgorithmState {
+        l.deselect_all();
         if self.gnome_pos == l.size {
             AlgorithmState::Done
         } else {
-            l.deselect_all();
             if self.gnome_pos == 0 || l.select(self.gnome_pos) > l.select(self.gnome_pos - 1) {
                 self.gnome_pos += 1;
             } else {

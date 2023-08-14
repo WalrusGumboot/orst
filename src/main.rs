@@ -1,6 +1,5 @@
 const WIN_HEIGHT: u32 = 640;
 const BAR_HEIGHT_MARGIN: u32 = 20;
-const FPS: f64 = 60.0;
 
 use clap::Parser;
 use sdl2::{
@@ -49,6 +48,8 @@ struct Args {
     width: u32,
     #[arg(short, long, default_value = "gnome")]
     algorithm: AlgorithmType,
+    #[arg(short, long, default_value = "60.0")]
+    fps: f64
 }
 
 fn main() {
@@ -100,19 +101,6 @@ fn main() {
         canvas.set_draw_color(Color::RGB(216, 222, 235));
         canvas.clear();
 
-        canvas
-            .copy(
-                &title_text_texture,
-                None,
-                Rect::new(
-                    10,
-                    10,
-                    title_text_surface.width(),
-                    title_text_surface.height(),
-                ),
-            )
-            .unwrap();
-
         match algorithm.tick(&mut list) {
             AlgorithmState::Busy => {}
             AlgorithmState::Done => {
@@ -147,7 +135,18 @@ fn main() {
             canvas.set_draw_color(colour);
             canvas.fill_rect(rect).unwrap();
         }
-
+        canvas
+            .copy(
+                &title_text_texture,
+                None,
+                Rect::new(
+                    10,
+                    10,
+                    title_text_surface.width(),
+                    title_text_surface.height(),
+                ),
+            )
+            .unwrap();
         draw_text(
             &format!("reads:  {}", list.reads),
             &mut canvas,
@@ -186,7 +185,7 @@ fn main() {
 
         canvas.present();
 
-        std::thread::sleep(std::time::Duration::from_secs_f64(FPS.recip()))
+        std::thread::sleep(std::time::Duration::from_secs_f64(args.fps.recip()))
     }
 
     println!("thank you for using orst.");
