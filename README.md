@@ -8,14 +8,15 @@ the name is just the letters of "sort" sorted alphabetically.
 
 ## usage
 
-simply run orst from the command line. it defaults to bubble sorting 40 bars. the command line options are:
+simply run orst from the command line. it defaults to comb sorting 40 bars. the command line options are:
 
 ```
 Options:
   -b, --bars <BARS>            [default: 40]
   -w, --width <WIDTH>          [default: 20]
-  -a, --algorithm <ALGORITHM>  [default: gnome] [possible values: see below]
+  -a, --algorithm <ALGORITHM>  [default: comb] [possible values: see below]
   -f, --fps <FPS>              [default: 60.0]
+  -l, --list-type <LIST_TYPE>  [default: shuffled] [possible values: shuffled, reversed, ordered]
   -h, --help                   print help
 ```
 
@@ -41,5 +42,7 @@ fn reset(&mut self) { *self = Self::new(); }
  * insertion sort
 
 ## screenshots
+comb sort in action:
 ![comb sort in action](screenshot.png)
+a finished state:
 ![a finished algortihm](finished.png)

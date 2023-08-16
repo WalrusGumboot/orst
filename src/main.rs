@@ -1,7 +1,7 @@
 const WIN_HEIGHT: u32 = 640;
 const BAR_HEIGHT_MARGIN: u32 = 20;
 
-use clap::Parser;
+use clap::{Parser, ValueEnum};
 use sdl2::{
     event::Event,
     keyboard::Keycode,
@@ -40,16 +40,25 @@ fn draw_text(
     )
 }
 
+#[derive(ValueEnum, Clone, Copy)]
+enum ListType {
+    Shuffled,
+    Reversed,
+    Ordered,
+}
+
 #[derive(Parser)]
 struct Args {
     #[arg(short, long, default_value = "40")]
     bars: usize,
     #[arg(short, long, default_value = "20")]
     width: u32,
-    #[arg(short, long, default_value = "gnome")]
+    #[arg(short, long, default_value = "comb")]
     algorithm: AlgorithmType,
     #[arg(short, long, default_value = "60.0")]
     fps: f64,
+    #[arg(short, long, default_value = "shuffled")]
+    list_type: ListType,
 }
 
 fn main() {
@@ -60,8 +69,12 @@ fn main() {
     }
 
     let num_elem_from_cell = unsafe { *NUM_ELEM_CELL.get().unwrap() };
-
-    let mut list: List<Bar> = List::shuffled(num_elem_from_cell);
+    let list_constructor: Box<dyn Fn() -> List<Bar>> = match args.list_type {
+        ListType::Shuffled => Box::new(|| List::shuffled(num_elem_from_cell)),
+        ListType::Reversed => Box::new(|| List::reversed(num_elem_from_cell)),
+        ListType::Ordered => Box::new(|| List::new(num_elem_from_cell)),
+    };
+    let mut list: List<Bar> = list_constructor();
     let mut algorithm: Box<dyn Algorithm<Item = Bar>> = match args.algorithm {
         AlgorithmType::Gnome => Box::new(gnome::GnomeSort::new()),
         AlgorithmType::Bubble => Box::new(bubble::BubbleSort::new()),
@@ -108,7 +121,7 @@ fn main() {
             AlgorithmState::Done => {
                 if goto_next {
                     algorithm.reset();
-                    list = List::<Bar>::shuffled(num_elem_from_cell);
+                    list = list_constructor();
                     goto_next = false;
                 }
             }
