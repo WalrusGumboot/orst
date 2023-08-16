@@ -10,6 +10,9 @@ pub mod comb;
 // insertion sorts
 pub mod insertion;
 
+// other sorts
+pub mod bogo;
+
 #[derive(Clone, ValueEnum)]
 pub enum AlgorithmType {
     Gnome,
@@ -17,4 +20,5 @@ pub enum AlgorithmType {
     OptimisedBubble,
     Comb,
     Insertion,
+    Bogo
 }

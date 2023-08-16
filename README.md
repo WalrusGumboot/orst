@@ -40,6 +40,7 @@ fn reset(&mut self) { *self = Self::new(); }
  * optimised bubble sort
  * comb sort
  * insertion sort
+ * bogosort
 
 ## screenshots
 comb sort in action:

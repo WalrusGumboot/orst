@@ -81,6 +81,7 @@ fn main() {
         AlgorithmType::OptimisedBubble => Box::new(optimised_bubble::OptimisedBubbleSort::new()),
         AlgorithmType::Comb => Box::new(comb::CombSort::new()),
         AlgorithmType::Insertion => Box::new(insertion::InsertionSort::new()),
+        AlgorithmType::Bogo => Box::new(bogo::BogoSort::new()),
     };
 
     let sdl2_ctx = sdl2::init().expect("could not initialise SDL2.");
@@ -108,6 +109,8 @@ fn main() {
 
     let mut goto_next = false;
 
+    let mut algorithm_done = false;
+
     let title_text = font.render(algorithm.name());
     let title_text_surface = title_text.blended(Color::BLACK).unwrap();
     let title_text_texture = title_text_surface.as_texture(&texture_creator).unwrap();
@@ -116,15 +119,19 @@ fn main() {
         canvas.set_draw_color(Color::RGB(216, 222, 235));
         canvas.clear();
 
-        match algorithm.tick(&mut list) {
-            AlgorithmState::Busy => {}
-            AlgorithmState::Done => {
-                if goto_next {
-                    algorithm.reset();
-                    list = list_constructor();
-                    goto_next = false;
+        if !algorithm_done {
+            match algorithm.tick(&mut list) {
+                AlgorithmState::Busy => {}
+                AlgorithmState::Done => {
+                    algorithm_done = true;
                 }
             }
+        }
+        if goto_next {
+            algorithm.reset();
+            list = list_constructor();
+            goto_next = false;
+            algorithm_done = false;
         }
 
         // display the list

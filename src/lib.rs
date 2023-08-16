@@ -102,6 +102,13 @@ impl<T: ListItem> List<T> {
         val.deselect();
         self.set(i, val.clone());
     }
+
+    pub fn sorted(&mut self) -> bool {
+        self.content.as_slice().windows(2).all(|slice| {
+            self.reads += 2;
+            slice[1] >= slice[0]
+        })
+    }
 }
 
 pub enum AlgorithmState {
